@@ -1,0 +1,7 @@
+{
+  "name": "NUMBER LAB",
+  "description": "An interactive, AI-remixable game sandbox inspired by Google I/O. Explore 5 experimental builds where numbers control the world.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
