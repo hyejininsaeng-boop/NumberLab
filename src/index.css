@@ -6,29 +6,33 @@
 
 @layer base {
   body {
-    cursor: none; /* Hide default to use our visible custom one */
+    cursor: none;
+    background-color: white; /* Ensure base for mix-blend-mode */
   }
 }
 
 .custom-cursor-dot {
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   background: white;
   border-radius: 50%;
   position: fixed;
+  top: 0;
+  left: 0;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 10000;
   mix-blend-mode: difference;
 }
 
 .custom-cursor-ring {
-  width: 30px;
-  height: 30px;
-  border: 1.5px solid white;
+  width: 36px;
+  height: 36px;
+  border: 2px solid white;
   border-radius: 50%;
   position: fixed;
+  top: 0;
+  left: 0;
   pointer-events: none;
-  z-index: 9998;
+  z-index: 9999;
   mix-blend-mode: difference;
-  transition: transform 0.1s ease-out;
 }

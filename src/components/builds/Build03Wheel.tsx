@@ -6,7 +6,7 @@ import { Language } from '../../types';
 import { UI_STRINGS } from '../../i18n';
 
 interface BuildProps {
-  onComplete: () => void;
+  onComplete: (score: number) => void;
   language: Language;
 }
 
@@ -15,8 +15,12 @@ export default function Build03Wheel({ onComplete, language }: BuildProps) {
   const [rotation, setRotation] = useState(0);
   const [isSpinning, setIsSpinning] = useState(true);
   const [sequence, setSequence] = useState<number[]>([]);
-  const [targetSequence] = useState([3, 1, 4]); // [REMIX HERE] Change the target combination
+  const [targetSequence] = useState(() => {
+    // Generate 3 random numbers from 1 to 8
+    return Array.from({ length: 3 }, () => Math.floor(Math.random() * 8) + 1);
+  });
   const [isCompleted, setIsCompleted] = useState(false);
+  const [precisionData, setPrecisionData] = useState<number[]>([]);
   const requestRef = useRef<number>(0);
 
   const WHEEL_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -44,8 +48,10 @@ export default function Build03Wheel({ onComplete, language }: BuildProps) {
     // Rotation 0 is top, numbers are placed around the circle
     const anglePerNumber = 360 / WHEEL_NUMBERS.length;
     // Normalize rotation to pick the one at the very top (pointy part)
-    // Pointer is at -90 deg logically or just at the top
     const normalizedRotation = (360 - (rotation % 360)) % 360;
+    const centerOffset = normalizedRotation % anglePerNumber;
+    const precision = Math.abs(centerOffset - (anglePerNumber / 2)); // distance from center of slice
+    
     const selectedIdx = Math.floor(normalizedRotation / anglePerNumber);
     const selectedNumber = WHEEL_NUMBERS[selectedIdx];
 
@@ -55,10 +61,16 @@ export default function Build03Wheel({ onComplete, language }: BuildProps) {
     const nextIdx = sequence.length;
     if (selectedNumber === targetSequence[nextIdx]) {
       const newSeq = [...sequence, selectedNumber];
+      const newPrecisionData = [...precisionData, precision];
       setSequence(newSeq);
+      setPrecisionData(newPrecisionData);
+
       if (newSeq.length === targetSequence.length) {
         setIsCompleted(true);
-        setTimeout(onComplete, 2000);
+        // Average precision: 22.5 is worst, 0 is best.
+        const avgPrecision = newPrecisionData.reduce((a, b) => a + b, 0) / newSeq.length;
+        const performanceScore = Math.max(0, Math.min(100, 100 - avgPrecision * 4));
+        setTimeout(() => onComplete(performanceScore), 2000);
       } else {
         // Wait a bit then restart spin
         setTimeout(() => setIsSpinning(true), 800);
@@ -66,6 +78,7 @@ export default function Build03Wheel({ onComplete, language }: BuildProps) {
     } else {
       // Wrong number, reset sequence
       setSequence([]);
+      setPrecisionData([]);
       setTimeout(() => setIsSpinning(true), 800);
     }
   };
@@ -149,7 +162,7 @@ export default function Build03Wheel({ onComplete, language }: BuildProps) {
               <Circle size={120} strokeWidth={8} />
             </motion.div>
             <h2 className="text-6xl font-black mb-4 uppercase">{t.syncStatus}</h2>
-            <p className="text-2xl font-medium opacity-80">{language === 'ko' ? "다음: 음성 인터페이스 동기화 중..." : language === 'ja' ? "次へ：音声インターフェース同期中..." : "Next: Syncing Audio Interface..."}</p>
+            <p className="text-2xl font-medium opacity-80">{t.nextProceed}</p>
           </motion.div>
         )}
       </AnimatePresence>

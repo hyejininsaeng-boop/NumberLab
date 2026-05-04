@@ -7,7 +7,7 @@ import { cn } from '../../lib/utils';
 import { UI_STRINGS } from '../../i18n';
 
 interface BuildProps {
-  onComplete: () => void;
+  onComplete: (score: number) => void;
   language: Language;
 }
 
@@ -15,8 +15,10 @@ export default function Build01Golf({ onComplete, language }: BuildProps) {
   const t = UI_STRINGS[language];
   const sceneRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<Matter.Engine | null>(null);
+  const startTimeRef = useRef<number>(Date.now());
   const [currentNumber, setCurrentNumber] = useState(7);
   const [hits, setHits] = useState(0);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   // [REMIX HERE] Change these values to modify the ball's physics
   const BALL_RESTITUTION = 0.8; 
@@ -79,6 +81,10 @@ export default function Build01Golf({ onComplete, language }: BuildProps) {
 
     World.add(engine.world, mouseConstraint);
 
+    // [VIBE TIP]: Matter.js MouseConstraint doesn't automatically follow pixel density or some touch offsets in iframes.
+    // Syncing the mouse element ensures touch events are captured.
+    render.mouse = mouse;
+
     // Collision Event
     Events.on(engine, 'collisionStart', (event) => {
       event.pairs.forEach((pair) => {
@@ -109,16 +115,23 @@ export default function Build01Golf({ onComplete, language }: BuildProps) {
   }, []);
 
   useEffect(() => {
-    if (currentNumber === 0) {
-      setTimeout(onComplete, 1500);
+    if (currentNumber === 0 && !isCompleted) {
+      setIsCompleted(true);
+      const timeTaken = (Date.now() - startTimeRef.current) / 1000;
+      // Score calculation: Lower time = Higher score (capped at 100)
+      const score = Math.max(0, Math.min(100, 100 - (timeTaken - 5) * 4));
+      setTimeout(() => onComplete(score), 1500);
     }
-  }, [currentNumber, onComplete]);
+  }, [currentNumber, onComplete, isCompleted]);
 
   return (
     <div className="w-full h-full relative overflow-hidden flex items-center justify-center">
       <div ref={sceneRef} className="absolute inset-0 z-0" />
       
       <div className="z-10 pointer-events-none flex flex-col items-center">
+        <h3 className="text-2xl font-bold bg-white/80 backdrop-blur px-8 py-3 mb-4 rounded-3xl shadow-xl border border-gray-100 italic">
+          {t.reactionScore}
+        </h3>
         <motion.div
           key={currentNumber}
           initial={{ scale: 0.8, opacity: 0 }}
@@ -148,17 +161,6 @@ export default function Build01Golf({ onComplete, language }: BuildProps) {
         </div>
       </div>
 
-      <div className="absolute top-10 left-10 flex gap-4 pointer-events-none">
-        <div className="bg-white/90 p-4 rounded-xl shadow-lg border border-gray-100">
-           <p className="text-[10px] font-bold text-gray-400 uppercase">{t.gravity}</p>
-           <p className="text-lg font-black">{GRAVITY_SCALE}</p>
-        </div>
-        <div className="bg-white/90 p-4 rounded-xl shadow-lg border border-gray-100">
-           <p className="text-[10px] font-bold text-gray-400 uppercase">{t.bounce}</p>
-           <p className="text-lg font-black">{BALL_RESTITUTION}</p>
-        </div>
-      </div>
-
       <AnimatePresence>
         {currentNumber === 0 && (
           <motion.div
@@ -173,8 +175,8 @@ export default function Build01Golf({ onComplete, language }: BuildProps) {
             >
               <Target size={120} strokeWidth={3} />
             </motion.div>
-            <h2 className="text-6xl font-black mb-4 uppercase">{t.labComplete}</h2>
-            <p className="text-2xl font-medium opacity-80">{language === 'ko' ? "다음: 빌드 02로 이동 중..." : language === 'ja' ? "次へ：ビルド02へ移行中..." : "Transitioning to Build 02..."}</p>
+            <h2 className="text-6xl font-black mb-4 uppercase">{t.syncStatus}</h2>
+            <p className="text-2xl font-medium opacity-80">{t.nextProceed}</p>
           </motion.div>
         )}
       </AnimatePresence>

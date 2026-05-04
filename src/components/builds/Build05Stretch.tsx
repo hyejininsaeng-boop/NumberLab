@@ -1,203 +1,118 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'motion/react';
-import { MousePointer2, Smile, Sparkles, RotateCcw } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { motion, AnimatePresence } from 'motion/react';
+import { MousePointer2, CheckCircle2, Target } from 'lucide-react';
 import { ATOMS, Language } from '../../types';
 import { UI_STRINGS } from '../../i18n';
 
 interface BuildProps {
-  onComplete: () => void;
+  onComplete: (score: number) => void;
   language: Language;
 }
 
 export default function Build05Stretch({ onComplete, language }: BuildProps) {
   const t = UI_STRINGS[language];
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isHovering, setIsHovering] = useState(false);
-  const [completeProgress, setCompleteProgress] = useState(0);
+  const [dots, setDots] = useState<{ x: number, y: number, id: number }[]>([]);
+  const [activeDot, setActiveDot] = useState(0);
+  const [startTime] = useState(Date.now());
+  const [errors, setErrors] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // [REMIX HERE] Change simulation parameters
-  const BLOB_COLOR = ATOMS.blue;
-  const ATTRACTION_STRENGTH = 0.15;
-  const FRICTION = 0.96;
-
+  // Generate 8 dots in a geometric path
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d')!;
-    let animationId: number;
-
-    const width = canvas.width = canvas.parentElement!.clientWidth;
-    const height = canvas.height = canvas.parentElement!.clientHeight;
-
-    const mouse = { x: width / 2, y: height / 2, active: false };
-
-    // Create points for a circle that we can deform
-    const points: { x: number, y: number, ox: number, oy: number, vx: number, vy: number }[] = [];
-    const numPoints = 80;
-    const radius = 120;
-
-    for (let i = 0; i < numPoints; i++) {
-        const angle = (i / numPoints) * Math.PI * 2;
-        const x = width / 2 + Math.cos(angle) * radius;
-        const y = height / 2 + Math.sin(angle) * radius;
-        points.push({ x, y, ox: x, oy: y, vx: 0, vy: 0 });
+    const newDots = [];
+    const count = 8;
+    const margin = 100;
+    
+    // Zigzag or path
+    for (let i = 0; i < count; i++) {
+        // Simple circular path for tracing
+        const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
+        const radius = 120;
+        newDots.push({
+            x: 50 + Math.cos(angle) * 35, // percentage
+            y: 50 + Math.sin(angle) * 35, // percentage
+            id: i
+        });
     }
+    setDots(newDots);
+  }, []);
 
-    const onMouseMove = (e: MouseEvent) => {
-        mouse.x = e.clientX;
-        mouse.y = e.clientY - 64; // Adjusted for header
-        mouse.active = true;
-        setIsHovering(true);
-    };
-
-    const render = () => {
-        ctx.clearRect(0, 0, width, height);
-
-        // Update logic
-        points.forEach(p => {
-            const dx = mouse.x - p.x;
-            const dy = mouse.y - p.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist < 200 && mouse.active) {
-                const force = (200 - dist) / 200;
-                p.vx += dx * force * ATTRACTION_STRENGTH;
-                p.vy += dy * force * ATTRACTION_STRENGTH;
-            }
-
-            // Return to original position
-            const rdx = p.ox - p.x;
-            const rdy = p.oy - p.y;
-            p.vx += rdx * 0.05;
-            p.vy += rdy * 0.05;
-
-            p.vx *= FRICTION;
-            p.vy *= FRICTION;
-            p.x += p.vx;
-            p.y += p.vy;
-        });
-
-        // Draw Blob
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-        
-        for (let i = 0; i < points.length; i++) {
-            const p1 = points[i];
-            const p2 = points[(i + 1) % points.length];
-            const midX = (p1.x + p2.x) / 2;
-            const midY = (p1.y + p2.y) / 2;
-            ctx.quadraticCurveTo(p1.x, p1.y, midX, midY);
+  const handleDotEnter = (id: number) => {
+    if (id === activeDot) {
+        if (id === dots.length - 1) {
+            // Success
+            const timeTaken = (Date.now() - startTime) / 1000;
+            const score = Math.max(0, Math.min(100, 100 - (timeTaken - 5) * 5 - errors * 5));
+            onComplete(score);
+        } else {
+            setActiveDot(prev => prev + 1);
         }
-        
-        ctx.closePath();
-        ctx.fillStyle = BLOB_COLOR;
-        ctx.fill();
-
-        // Draw the number "5" inside the blob
-        ctx.font = '900 120px Inter, sans-serif';
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        
-        // Slightly laggy center for the text
-        const avgX = points.reduce((acc, p) => acc + p.x, 0) / points.length;
-        const avgY = points.reduce((acc, p) => acc + p.y, 0) / points.length;
-        ctx.fillText('5', avgX, avgY);
-
-        setCompleteProgress(prev => {
-            if (isHovering) return Math.min(prev + 0.2, 100);
-            return prev;
-        });
-
-        animationId = requestAnimationFrame(render);
-    };
-
-    window.addEventListener('mousemove', onMouseMove);
-    animationId = requestAnimationFrame(render);
-
-    return () => {
-        window.removeEventListener('mousemove', onMouseMove);
-        cancelAnimationFrame(animationId);
-    };
-  }, [isHovering]);
+    } else if (id > activeDot) {
+        // Wrong dot
+        setErrors(e => e + 1);
+    }
+  };
 
   return (
-    <div className="w-full h-full relative select-none bg-white">
-      <canvas ref={canvasRef} className="absolute inset-0 z-0" />
-      
-      <div className="absolute inset-0 pointer-events-none flex flex-col items-center justify-between p-12">
-          <div className="text-center">
-            <h2 className="text-2xl font-black text-gray-300 tracking-widest uppercase mb-2">Build 05</h2>
-            <p className="text-gray-400 font-medium">{t.fluidExp}</p>
-          </div>
-
-          <div className="w-full max-w-md bg-gray-50 h-2 rounded-full overflow-hidden border border-gray-100">
-             <motion.div 
-               className="h-full bg-blue-500" 
-               animate={{ width: `${completeProgress}%` }}
-               transition={{ ease: "linear" }}
-             />
-          </div>
+    <div className="w-full h-full flex flex-col items-center justify-center p-8 bg-[#F8F9FA] select-none" ref={containerRef}>
+      <div className="text-center mb-12">
+        <h3 className="text-2xl font-black bg-white px-8 py-3 rounded-2xl border border-gray-100 shadow-sm uppercase tracking-tight">
+          Steady Hand Test
+        </h3>
+        <p className="text-xs text-gray-400 font-bold mt-4 uppercase tracking-widest">Connect dots 1 to {dots.length} precisely</p>
       </div>
 
-      {!isHovering && (
-         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <motion.div 
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="flex flex-col items-center gap-4 text-gray-400"
-            >
-                <MousePointer2 size={48} className="fill-gray-100" />
-                <p className="font-bold uppercase tracking-widest">{t.moveMouse}</p>
-            </motion.div>
+      <div className="relative w-full max-w-lg aspect-square bg-white rounded-[3rem] border border-gray-100 shadow-xl overflow-hidden">
+         {/* Background Path Hint */}
+         <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-5">
+            <path 
+              d={`M ${dots.map(d => `${d.x}% ${d.y}%`).join(' L ')} Z`}
+              fill="none" 
+              stroke="black" 
+              strokeWidth="5" 
+              strokeDasharray="10 10"
+            />
+         </svg>
+
+         {dots.map((dot, idx) => {
+            const isCompleted = idx < activeDot;
+            const isActive = idx === activeDot;
+            const isTarget = idx === activeDot;
+
+            return (
+              <motion.div
+                key={dot.id}
+                className="absolute"
+                style={{ 
+                    left: `${dot.x}%`, 
+                    top: `${dot.y}%`,
+                    transform: 'translate(-50%, -50%)'
+                }}
+              >
+                <div 
+                  onMouseEnter={() => handleDotEnter(idx)}
+                  className={`
+                    w-12 h-12 rounded-full flex items-center justify-center font-black transition-all cursor-crosshair
+                    ${isCompleted ? 'bg-cyan-500 text-white' : isActive ? 'bg-gray-900 text-white scale-110 shadow-xl ring-4 ring-cyan-500/20' : 'bg-gray-100 text-gray-300'}
+                  `}
+                >
+                  {isCompleted ? <CheckCircle2 size={24} /> : idx + 1}
+                </div>
+              </motion.div>
+            );
+         })}
+      </div>
+
+      <div className="mt-12 flex gap-4 items-center">
+         <div className="flex gap-1">
+            {dots.map((_, i) => (
+                <div 
+                  key={i} 
+                  className={`w-4 h-1 rounded-full transition-all ${i < activeDot ? 'bg-cyan-500 w-8' : 'bg-gray-200'}`} 
+                />
+            ))}
          </div>
-      )}
-
-      {completeProgress >= 100 && (
-         <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="absolute inset-0 bg-[#202124] backdrop-blur-xl z-50 flex flex-col items-center justify-center text-white text-center p-10"
-         >
-            <div className="flex gap-4 mb-8">
-                <div className="w-4 h-4 rounded-full bg-[#4285F4]" />
-                <div className="w-4 h-4 rounded-full bg-[#EA4335]" />
-                <div className="w-4 h-4 rounded-full bg-[#FBBC04]" />
-                <div className="w-4 h-4 rounded-full bg-[#34A853]" />
-            </div>
-            <h2 className="text-6xl md:text-8xl font-black mb-6 tracking-tighter uppercase">{t.labComplete}</h2>
-            <p className="text-2xl text-gray-400 max-w-lg font-medium mb-12">
-                {t.completeMsg}
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-                <div className="bg-white/5 border border-white/10 px-6 py-4 rounded-2xl flex items-center gap-3">
-                   <Smile className="text-[#34A853]" />
-                   <div className="text-left">
-                      <p className="text-[10px] font-bold text-gray-500 uppercase">{t.buildStatus}</p>
-                      <p className="font-bold uppercase">{t.verified}</p>
-                   </div>
-                </div>
-                <div className="bg-white/5 border border-white/10 px-6 py-4 rounded-2xl flex items-center gap-3">
-                   <Sparkles className="text-[#FBBC04]" />
-                   <div className="text-left">
-                      <p className="text-[10px] font-bold text-gray-500 uppercase">AI REMIX</p>
-                      <p className="font-bold uppercase">{t.ready}</p>
-                   </div>
-                </div>
-            </div>
-            
-            <button 
-                onClick={() => window.location.reload()}
-                className="mt-16 text-gray-500 hover:text-white transition-colors font-bold uppercase tracking-widest flex items-center gap-2"
-            >
-                <RotateCcw size={18} /> {t.startOver}
-            </button>
-         </motion.div>
-      )}
-
-      {/* [ASK AI] "Prompt Gemini: Add a shadow tail trailing behind the mouse cursor" */}
+      </div>
     </div>
   );
 }

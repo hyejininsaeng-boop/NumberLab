@@ -13,6 +13,8 @@ interface BuildManualProps {
 export default function BuildManual({ build, onStart, language }: BuildManualProps) {
   const t = UI_STRINGS[language];
   const content = build.manual[language];
+  const localizedTitle = t.buildTitles[build.id];
+  const localizedDescription = t.buildDescriptions[build.id];
 
   return (
     <motion.div 
@@ -32,17 +34,17 @@ export default function BuildManual({ build, onStart, language }: BuildManualPro
            <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center mb-4">
               <BookOpen size={40} />
            </div>
-           <h3 className="text-xl font-bold uppercase tracking-tighter">{t.labManual}</h3>
-           <p className="text-white/60 text-xs font-bold mt-2">BUILD INFO</p>
+           <h3 className="text-xl font-bold uppercase tracking-tighter text-center">{localizedTitle}</h3>
+           <p className="text-white/60 text-xs font-bold mt-2">SENSORY DIAGNOSIS</p>
         </div>
 
         {/* Right Info Area */}
         <div className="md:w-2/3 p-10 md:p-12">
             <header className="mb-8">
                 <div className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: build.color }}>
-                    {build.description}
+                    {localizedDescription}
                 </div>
-                <h2 className="text-4xl font-black text-gray-900 tracking-tight">{build.title}</h2>
+                <h2 className="text-4xl font-black text-gray-900 tracking-tight">{localizedTitle}</h2>
             </header>
 
             <div className="space-y-6 mb-10">
@@ -63,18 +65,6 @@ export default function BuildManual({ build, onStart, language }: BuildManualPro
                     <div>
                         <h4 className="font-bold text-gray-900 text-sm">{t.action}</h4>
                         <p className="text-gray-500 text-sm leading-relaxed">{content.action}</p>
-                    </div>
-                </section>
-
-                <section className="flex gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-gray-50 flex-shrink-0 flex items-center justify-center text-gray-400">
-                        <Sparkles size={20} />
-                    </div>
-                    <div>
-                        <h4 className="font-bold text-gray-900 text-sm">{t.aiTips}</h4>
-                        <p className="text-blue-500/80 text-sm font-medium leading-relaxed italic">
-                           "{content.aiKey}"
-                        </p>
                     </div>
                 </section>
             </div>

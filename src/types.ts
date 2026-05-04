@@ -1,11 +1,12 @@
-export type BuildId = 'build-01' | 'build-02' | 'build-03' | 'build-04' | 'build-05';
+export type BuildId = 
+  | 'build-01' | 'build-02' | 'build-03' | 'build-04' | 'build-05'
+  | 'build-06' | 'build-07' | 'build-08' | 'build-09' | 'build-10';
 
 export type Language = 'en' | 'ko' | 'ja';
 
 export interface BuildManualContent {
   objective: string;
   action: string;
-  aiKey: string;
 }
 
 export interface BuildInfo {
@@ -21,6 +22,10 @@ export const ATOMS = {
   red: '#EA4335',
   yellow: '#FBBC04',
   green: '#34A853',
+  purple: '#A142F4',
+  cyan: '#24C1E0',
+  orange: '#E67C19',
+  pink: '#F06292',
   white: '#FFFFFF',
   gray: '#F8F9FA',
   dark: '#202124',
@@ -29,116 +34,201 @@ export const ATOMS = {
 export const BUILDS: BuildInfo[] = [
   { 
     id: 'build-01', 
-    title: 'Number Golf', 
-    description: 'Physics & Gravity', 
+    title: 'Reaction Velocity', 
+    description: 'Reaction Speed Test', 
     color: ATOMS.blue,
     manual: {
       en: {
-        objective: "Physics Engine Experiment: Experience mass and gravity.",
-        action: "Drag the black ball with your mouse to hit the blue number '7'. Each hit decreases the number. Reach 0 to continue.",
-        aiKey: "Try adjusting gravity or ball restitution to change difficulty."
+        objective: "Digital Reflex Experiment: Measure how fast you can respond to physical stimuli.",
+        action: "Drag the black ball to hit the blue target '7' repeatedly. Reach 0 to complete.",
       },
       ko: {
-        objective: "물리 엔진 실험: 숫자의 질량과 중력을 체험하세요.",
-        action: "검은색 공을 마우스로 드래그하여 중앙의 파란색 숫자 '7'을 맞추세요. 충돌할 때마다 숫자가 줄어들며 0이 되면 다음 단계로 이동합니다.",
-        aiKey: "중력 값이나 공의 탄성(Bounce)을 조절하여 난이도를 바꿔보세요."
+        objective: "반사 신경 실험: 물리적 자극에 얼마나 빨리 반응하는지 측정합니다.",
+        action: "검은색 공을 마우스로 드래그하여 중앙의 파란색 공을 7번 이상 충돌시키세요. 충돌할 때마다 숫자가 줄어들며 0이 되면 다음 단계로 이동합니다.",
       },
       ja: {
-        objective: "物理エンジン実験：数字の質量と重力を体験してください。",
-        action: "マウスで黒いボールをドラッグし、中央の青い数字「7」に当ててください。当たるたびに数字が減り、0になると次のステージへ進みます。",
-        aiKey: "重力値やボールの弾力性を調整して難易度を変えてみてください。"
+        objective: "デジタル反射神経実験：物理的刺激にどれだけ速く反応できるかを測定します。",
+        action: "黒いボールをドラッグして、中央の青いターゲット「7」に繰り返し当ててください。0になると完了です。",
       }
     }
   },
   { 
     id: 'build-02', 
-    title: 'Number Grid', 
-    description: 'Logic & Sequences', 
+    title: 'Working Memory', 
+    description: 'Information Processing Speed', 
     color: ATOMS.red,
     manual: {
       en: {
-        objective: "Summation Logic Experiment: Find relationships between random numbers.",
-        action: "The red number at the top is the target sum. Click numbers on the grid so their sum equals the target. Succeed 3 times.",
-        aiKey: "Expand the grid size (3x3 -> 5x5) to create more complex puzzles."
+        objective: "Memory Load Experiment: Test your ability to store and process temporary information.",
+        action: "Sum up grid numbers to match the target. Do this 3 times quickly.",
       },
       ko: {
-        objective: "합산 논리 실험: 무작위 숫자들 사이의 관계를 찾으세요.",
-        action: "상단의 빨간색 숫자가 목표 합계입니다. 그리드에서 숫자를 클릭하여 합이 목표값과 정확히 일치하도록 만드세요. 총 3번 성공해야 합니다.",
-        aiKey: "그리드의 크기(3x3 -> 5x5)를 키워 더 복잡한 퍼즐을 만들어보세요."
+        objective: "기억 부하 실험: 일시적인 정보를 저장하고 처리하는 능력을 테스트합니다.",
+        action: "그리드의 숫자들을 2~3개 선택하여 합산된 숫자가 목표 숫자와 일치하게 만드세요. 총 3번 성공해야 완료됩니다.",
       },
       ja: {
-        objective: "合算ロジック実験：ランダムな数字の間の関係を見つけてください。",
-        action: "上部の赤い数字が目標の合計値です。グリッドの数字をクリックして、合計が目標値と一致するようにしてください。合計3回成功する必要があります。",
-        aiKey: "グリッドサイズを大きくして、より複雑なパズルを作成してみてください。"
+        objective: "記憶負荷実験：一時的な情報を保存し、処理する能力をテストします。",
+        action: "グリッドの数字を2〜3個合算して目標値と一致させてください。これを3回素早く繰り返してください。",
       }
     }
   },
   { 
     id: 'build-03', 
-    title: 'Number Wheel', 
-    description: 'Patterns & Cycles', 
+    title: 'Impulse Control', 
+    description: 'Timing & Rhythm Sensitivity', 
     color: ATOMS.yellow,
     manual: {
       en: {
-        objective: "Pattern Sync Experiment: Match the timing of rotating systems.",
-        action: "Follow the 3-number sequence shown at the top. Click 'LOCK NUMBER' to stop the wheel at the correct number.",
-        aiKey: "Increase rotation speed or make the sequence longer."
+        objective: "Inhibition Experiment: Control your timing to match perfectly with rotating cycles.",
+        action: "Match the 3-number sequence. Stop the wheel exactly on the target number.",
       },
       ko: {
-        objective: "패턴 동기화 실험: 회전하는 시스템의 타이밍을 맞추세요.",
-        action: "상단에 표시된 3개의 숫자 시퀀스를 순서대로 맞춰야 합니다. 휠이 돌아갈 때 'LOCK NUMBER' 버튼을 눌러 정확한 숫자에 멈추세요.",
-        aiKey: "휠의 회전 속도를 올리거나 비밀번호 숫자를 더 길게 설정해보세요."
+        objective: "억제 제어 실험: 회전하는 주기에 맞춰 완벽하게 타이밍을 조절하세요.",
+        action: "3자리 숫자 시퀀스를 맞추세요. 회전하는 휠을 정확히 해당 숫자에서 멈춰야 합니다.",
       },
       ja: {
-        objective: "パターン同期実験：回転するシステムのタイミングを合わせてください。",
-        action: "上部に表示された3つの数字のシーケンスを順番に合わせてください。ホイールが回転している時に「LOCK NUMBER」ボタンを押し、正確な数字で止めてください。",
-        aiKey: "ホイールの回転速度を上げたり、パスワードを長く設定してみてください。"
+        objective: "抑制制御実験：回転する周期に合わせて完璧にタイミングを調節してください。",
+        action: "3桁の数字シーケンスを合わせてください。回転するホイールを正確に該当する数字で止める必要があります。",
       }
     }
   },
   { 
     id: 'build-04', 
-    title: 'Voice Number', 
-    description: 'Audio & Resonance', 
+    title: 'Breath Stability', 
+    description: 'Vocal Energy Control', 
     color: ATOMS.green,
     manual: {
       en: {
-        objective: "Voice Energy Experiment: Convert sound volume into data.",
-        action: "Allow microphone access and make some noise! The central number grows based on your volume. Charge it to 100%.",
-        aiKey: "Modify the sensor to respond only to specific frequencies (High/Low pitch)."
+        objective: "Energy Consistency Experiment: Maintain a steady vocal output to measure breath control.",
+        action: "Keep making sound to charge the number to 100%. Stability is key.",
       },
       ko: {
-        objective: "음성 에너지 실험: 소리의 크기를 데이터로 변환합니다.",
-        action: "마이크 권한을 허용하고 소리를 내보세요. 당신의 목소리 크기(Volume)에 따라 중앙의 숫자가 충전됩니다. 100%까지 에너지를 채우세요.",
-        aiKey: "특정 주파수(고음/저음)에만 반응하도록 센서를 개조해볼 수 있습니다."
+        objective: "에너지 일관성 실험: 일정한 목소리 출력을 유지하여 호흡 조절 능력을 측정합니다.",
+        action: "목소리를 계속 내어 숫자를 100%까지 충전하세요. 안정적인 일관성이 중요합니다.",
       },
       ja: {
-        objective: "音声エネルギー実験：音の大きさをデータに変換します。",
-        action: "マイクの許可を与えて、音を出してください。あなたの声の大きさに応じて中央の数字がチャージされます。100%までエネルギーを満たしてください。",
-        aiKey: "特定の周波奏（高音・低音）にのみ反応するようにセンサーを改造できます。"
+        objective: "エネルギー一貫性実験：一定の音声出力を維持して呼吸調節能力を測定します。",
+        action: "声を出し続けて数字を100%までチャージしてください。安定した一貫性が重要です。",
       }
     }
   },
   { 
     id: 'build-05', 
-    title: 'Stretch Number', 
-    description: 'Fluidity & Form', 
-    color: ATOMS.blue,
+    title: 'Fine Motor Skills', 
+    description: 'Precision Control & Flow', 
+    color: ATOMS.cyan,
     manual: {
       en: {
-        objective: "Fluid Interaction Experiment: Break and reconstruct fixed forms.",
-        action: "Move your mouse to stretch and deform the number. Interact enough to generate the final lab report.",
-        aiKey: "Ask AI to change colors or friction/stickiness level."
+        objective: "Precision Interaction Experiment: Measure the delicacy of your mouse movements.",
+        action: "Trace the sequence of dots precisely without touching the edges. Steady hand is required.",
       },
       ko: {
-        objective: "유체 상호작용 실험: 고정된 형태를 무너뜨리고 재구성하세요.",
-        action: "마우스를 움직여 숫자의 형태를 자유롭게 늘리고 변형시키세요. 일정 시간 동안 충분히 상호작용하면 최종 리포트가 생성됩니다.",
-        aiKey: "숫자의 색상이나 유체의 끈적임(Friction) 정도를 AI에게 요청해 바꿔보세요."
+        objective: "정밀 상호작용 실험: 마우스 움직임의 섬세함과 정교함을 측정합니다.",
+        action: "표시되는 원들을 순서대로 정교하게 따라가세요. 선을 벗어나지 않는 것이 중요합니다.",
       },
       ja: {
-        objective: "流体相互作用実験：固定された形を壊して再構成してください。",
-        action: "マウスを動かして、数字の形を自由に伸ばしたり変形させたりしてください。一定時間相互作用すると、最終レポートが生成されます。",
-        aiKey: "数字の色や流体の摩擦（粘り気）の程度をAIに変えてもらうよう頼んでみてください。"
+        objective: "精密相互作用実験：マウスの動きの繊細さと精巧さを測定します。",
+        action: "表示されるドットを順番に正確にたどってください。線を外れないことが重要です。",
+      }
+    }
+  },
+  {
+    id: 'build-06',
+    title: 'Visual Perception',
+    description: 'Color Nuance Detection',
+    color: ATOMS.purple,
+    manual: {
+      en: {
+        objective: "Nuance Detection Experiment: Find the subtle difference in color shades.",
+        action: "Find the one number with a slightly different color among identical ones.",
+      },
+      ko: {
+        objective: "뉘앙스 감지 실험: 색상 그림자의 미세한 차이를 찾아내세요.",
+        action: "수많은 숫자 중 미세하게 다른 색상을 띄고 있는 단 하나의 숫자를 클릭하세요.",
+      },
+      ja: {
+        objective: "ニュアンス検知実験：色のわずかな違いを見つけ出してください。",
+        action: "たくさんの数字の中から、わずかに色が異なる一つだけの数字をクリックしてください。",
+      }
+    }
+  },
+  {
+    id: 'build-07',
+    title: 'Peripheral Vision',
+    description: 'Field of View Test',
+    color: ATOMS.orange,
+    manual: {
+      en: {
+        objective: "Peripheral Awareness Experiment: Detect changes in your side vision.",
+        action: "Look at the center. Identify numbers appearing momentarily at the edges.",
+      },
+      ko: {
+        objective: "주변 인식 실험: 시야의 가장자리에서 일어나는 변화를 감지합니다.",
+        action: "중앙을 바라보는 상태에서, 가장자리에 잠깐 나타났다 사라지는 숫자를 인식하세요.",
+      },
+      ja: {
+        objective: "周辺認識実験：視界の端で起こる変化を感知します。",
+        action: "中央を見つめたまま、端に一瞬現れて消える数字を認識してください。",
+      }
+    }
+  },
+  {
+    id: 'build-08',
+    title: 'Cognitive Interference',
+    description: 'Stroop Effect & Inhibition',
+    color: ATOMS.red,
+    manual: {
+      en: {
+        objective: "Conflict Resolution Experiment: Suppress your instinctual reaction to word meaning.",
+        action: "Click the button matching the 'COLOR' of the text, not the text itself.",
+      },
+      ko: {
+        objective: "갈등 해결 실험: 단어의 의미에 대한 본능적 반응을 억제하세요.",
+        action: "글자의 의미가 아닌, 글자가 칠해진 '색상'에 해당하는 버튼을 누르세요.",
+      },
+      ja: {
+        objective: "葛藤解決実験：単語の意味に対する本能的な反応を抑制してください。",
+        action: "文字の意味ではなく、文字が塗られた「色」に該当するボタンを押してください。",
+      }
+    }
+  },
+  {
+    id: 'build-09',
+    title: 'Divided Attention',
+    description: 'Multitasking Capacity',
+    color: ATOMS.pink,
+    manual: {
+      en: {
+        objective: "Resource Allocation Experiment: Manage two tasks simultaneously.",
+        action: "Balance the number at the center while clicking targets appearing around.",
+      },
+      ko: {
+        objective: "자원 배분 실험: 두 가지 작업을 동시에 관리하세요.",
+        action: "중앙의 숫자가 떨어지지 않게 중심을 잡으면서 주변의 타겟을 클릭하세요.",
+      },
+      ja: {
+        objective: "リソース配分実験：2つのタスクを同時に管理してください。",
+        action: "中央の数字が落ちないようにバランスを取りながら、周りのターゲットをクリックしてください。",
+      }
+    }
+  },
+  {
+    id: 'build-10',
+    title: 'Spatial Memory',
+    description: 'Sequence & Space Retrieval',
+    color: ATOMS.green,
+    manual: {
+      en: {
+        objective: "Spatial Retrieval Experiment: Remember and reverse geometric sequences.",
+        action: "Observe the blinking sequence and click them in REVERSE order.",
+      },
+      ko: {
+        objective: "공간 인출 실험: 기하학적 시퀀스를 기억하고 역순으로 되돌립니다.",
+        action: "숫자들이 깜빡이는 순서를 기억한 후, 역순으로 클릭하세요.",
+      },
+      ja: {
+        objective: "空間想起実験：幾何学的なシーケンスを記憶し、逆順に再現します。",
+        action: "数字が点滅する順番を記憶した後、逆順にクリックしてください。",
       }
     }
   },

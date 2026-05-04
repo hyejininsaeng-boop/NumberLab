@@ -6,15 +6,17 @@ import { Language } from '../../types';
 import { UI_STRINGS } from '../../i18n';
 
 interface BuildProps {
-  onComplete: () => void;
+  onComplete: (score: number) => void;
   language: Language;
 }
 
 export default function Build04Voice({ onComplete, language }: BuildProps) {
   const t = UI_STRINGS[language];
+  const stabilityRef = useRef<number[]>([]);
   const [volume, setVolume] = useState(0);
   const [currentNumber, setCurrentNumber] = useState(0);
   const [isListening, setIsListening] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -60,20 +62,32 @@ export default function Build04Voice({ onComplete, language }: BuildProps) {
             const next = prev + (average / 100) * GROWTH_FACTOR;
             return Math.min(next, TARGET_NUMBER);
         });
+        stabilityRef.current.push(average);
     }
 
     animationRef.current = requestAnimationFrame(tick);
   };
 
   useEffect(() => {
-    if (currentNumber >= TARGET_NUMBER) {
+    if (currentNumber >= TARGET_NUMBER && !isCompleted) {
+        setIsCompleted(true);
         cancelAnimationFrame(animationRef.current);
         if (audioContextRef.current) {
             audioContextRef.current.close();
         }
-        setTimeout(onComplete, 2000);
+
+        // Calculate stability score
+        const data = stabilityRef.current;
+        if (data.length > 50) {
+            const avg = data.reduce((a, b) => a + b, 0) / data.length;
+            const variance = data.reduce((a, b) => a + (b - avg) ** 2, 0) / data.length;
+            const performanceScore = Math.max(0, Math.min(100, 100 - Math.sqrt(variance) * 2.5));
+            setTimeout(() => onComplete(performanceScore), 2000);
+        } else {
+            setTimeout(() => onComplete(0), 2000);
+        }
     }
-  }, [currentNumber, onComplete]);
+  }, [currentNumber, onComplete, isCompleted]);
 
   useEffect(() => {
     return () => {
@@ -180,7 +194,7 @@ export default function Build04Voice({ onComplete, language }: BuildProps) {
               <Zap size={120} strokeWidth={3} fill="white" />
             </motion.div>
             <h2 className="text-6xl font-black mb-4 uppercase">{t.syncStatus}</h2>
-            <p className="text-2xl font-medium opacity-80">{language === 'ko' ? "마지막 시뮬레이션 로딩 중..." : language === 'ja' ? "最終シミュレーション読み込み中..." : "Loading Final Simulation..."}</p>
+            <p className="text-2xl font-medium opacity-80">{t.nextProceed}</p>
           </motion.div>
         )}
       </AnimatePresence>
